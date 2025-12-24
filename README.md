@@ -6,7 +6,7 @@
 
 ## ✨ Features
 - **🕵️ Deep Scan:** Analyzes entire PDF documents using the Gemini 3 Flash model.
-- **🚩 Red Flag Detection:** Automatically highlights high-risk language in :red[red].
+- **🚩 Red Flag Detection:** Automatically highlights high-risk language in.
 - **🔢 Risk Scoring:** Provides an instant safety rating from 1 to 10.
 - **📝 Summary:** Generates a "Bottom Line" summary for quick decision-making.
 - **❄️ Snow Effect:** Celebrates safe, low-risk documents!

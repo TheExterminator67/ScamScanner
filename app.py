@@ -4,8 +4,7 @@ from pypdf import PdfReader
 import re
 
 # SETUP
-API_KEY = "AIzaSyAdLkKKdi7DebShLbwgN6cpKVaX1OKhY6w" 
-genai.configure(api_key=API_KEY)
+genai.configure(api_key=st.secrets["GEMINI_KEY"])
 
 # GEMINI MODEL
 model_names = ['gemini-3-flash', 'gemini-2.5-flash', 'gemini-1.5-flash']
@@ -69,5 +68,6 @@ if uploaded_file:
                 
         except Exception as e:
             st.error(f"Error during analysis: {e}")
+
 
 st.caption("Disclaimer: This is an AI tool, not a lawyer. Always read the fine print!")

@@ -20,7 +20,7 @@ except Exception as e:
     st.sidebar.error(f"❌ AI Connection Failed: {e}")
 
 # UI BRANDING
-st.title("🛡️ Legal Guard: :blue[Pro Scanner]")
+st.title("🛡️ Legal Hero: :blue[ScamScanner]")
 st.markdown("### Detects scams, traps, and predatory language in seconds.")
 
 uploaded_file = st.file_uploader("Upload a PDF contract", type=["pdf"])
@@ -79,4 +79,5 @@ if uploaded_file:
             st.error(f"Error during analysis: {e}")
 
 st.divider()
-st.caption("Built with 💙 for Legal Safety | 2025")
+st.caption("Built with 💙 for Legal Safety , by a 16 year old | 2025")
+

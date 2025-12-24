@@ -2,23 +2,21 @@ import streamlit as st
 import google.generativeai as genai
 from pypdf import PdfReader
 
-# 1. Page Configuration
+# page config
 st.set_page_config(page_title="Legal Guard", page_icon="🛡️")
 
-# 2. Secure API Setup
-# We check for the secret first. If it's not there, the app stops immediately with a clear message.
+# setup
 if "GEMINI_KEY" not in st.secrets:
     st.error("❌ GEMINI_KEY missing! Go to Streamlit Settings > Secrets and add it.")
     st.stop()
 
-# Configure the AI with your secret key
+
 genai.configure(api_key=st.secrets["GEMINI_KEY"])
 
-# 3. Initialize the Model GLOBALLY
-# By putting this here (not inside a function), the 'model' is NEVER None.
+# Initialize the Model GLOBALLY
 model = genai.GenerativeModel('gemini-2.0-flash')
 
-# 4. PDF Helper Function
+# PDF Helper Function
 def get_pdf_text(upload):
     pdf = PdfReader(upload)
     content = ""
@@ -26,7 +24,7 @@ def get_pdf_text(upload):
         content += page.extract_text()
     return content
 
-# 5. User Interface
+# ui
 st.title("🛡️ Legal Guard: AI Scam Scanner")
 st.write("I help you find hidden traps in contracts. Upload your PDF below.")
 
@@ -54,4 +52,5 @@ if st.button("Analyze Document"):
 
 st.divider()
 st.caption("Built by a 16-year-old dev | 2025 AI Safety Project")
+
 

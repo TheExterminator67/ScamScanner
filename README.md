@@ -1,3 +1,4 @@
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](YOUR_STREAMLIT_APP_URL)
 # 🛡️ Legal Hero: AI Contract Scanner(ScamScanner)
 
 **Legal Hero** is a smart, AI-powered investigator designed to help users identify scams, predatory clauses, and hidden traps in legal documents and contracts.

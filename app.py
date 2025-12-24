@@ -4,7 +4,7 @@ from pypdf import PdfReader
 import re
 
 # --- 1. SETUP ---
-st.set_page_config(page_title="Legal Guard", page_icon="🛡️", layout="wide")
+st.set_page_config(page_title="Legal Hero", page_icon="🛡️", layout="wide")
 
 if "GEMINI_KEY" not in st.secrets:
     st.error("❌ Missing GEMINI_KEY in Secrets!")
@@ -19,7 +19,7 @@ if "messages" not in st.session_state:
 
 # --- 2. SIDEBAR (Translation & Credits) ---
 with st.sidebar:
-    st.title("🛡️ Legal Guard")
+    st.title("🛡️ Legal Hero")
     
     # Subtle Credit in Sidebar
     st.markdown("👨‍💻 **Dev:** 16-year-old developer")
@@ -35,7 +35,7 @@ with st.sidebar:
         st.session_state.messages = []
 
 # --- 3. MAIN UI ---
-st.title("🛡️ Legal Guard: Scam Scanner")
+st.title("🛡️ Legal Hero: Scam Scanner")
 
 uploaded_file = st.file_uploader("Upload a PDF to scan for scams", type=["pdf"])
 
@@ -94,3 +94,4 @@ with col2:
 # --- 5. CLEAN FOOTER ---
 st.divider()
 st.caption("🛡️ Built by a 16-year-old dev | Disclaimer: AI analysis, not legal advice.")
+

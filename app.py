@@ -3,10 +3,9 @@ import google.generativeai as genai
 from pypdf import PdfReader
 import re
 
-# 1. SETUP
+# --- 1. SETUP ---
 st.set_page_config(page_title="Legal Guard", page_icon="🛡️", layout="wide")
 
-# API KEY CHECK
 if "GEMINI_KEY" not in st.secrets:
     st.error("❌ Missing GEMINI_KEY in Secrets!")
     st.stop()
@@ -22,17 +21,17 @@ if "messages" not in st.session_state:
 with st.sidebar:
     st.title("🛡️ Legal Guard")
     
-    # YOUR CREDIT BADGE
-    st.info("🚀 **Project Info**\n\nMade by a 16-year-old developer focused on legal safety.")
+    # Subtle Credit in Sidebar
+    st.markdown("👨‍💻 **Dev:** 16-year-old developer")
     
-    # THE TRANSLATION THINGY
+    # THE TRANSLATION THINGY (Arabic Added)
     language = st.selectbox(
         "🌐 Select Language",
-        ["English", "Spanish", "French", "German", "Chinese", "Hindi", "Indonesian"]
+        ["English", "Arabic", "Spanish", "French", "German", "Chinese", "Hindi", "Indonesian"]
     )
     st.divider()
     st.success("✅ AI Brain Connected")
-    if st.button("Clear Chat"):
+    if st.button("Clear Chat History"):
         st.session_state.messages = []
 
 # --- 3. MAIN UI ---
@@ -47,8 +46,9 @@ if uploaded_file:
                 reader = PdfReader(uploaded_file)
                 text = "".join([page.extract_text() for page in reader.pages])
                 
+                # FORMAT PROMPT (Instructing Arabic Support)
                 prompt = f"""
-                Analyze this document for scams. Respond in {language}.
+                Analyze this document for scams. Respond entirely in {language}.
                 YOU MUST START YOUR RESPONSE WITH: RISK SCORE: [number 1-10]
                 Highlight dangerous parts with :red-background[text].
                 Include Red Flags, Legal Loopholes, Advice, and a SUMMARY.
@@ -91,8 +91,6 @@ with col2:
                 st.markdown(chat_res.text)
                 st.session_state.messages.append({"role": "assistant", "content": chat_res.text})
 
-# --- 5. THE FOOTER ---
+# --- 5. CLEAN FOOTER ---
 st.divider()
-# This centers the credit at the bottom
-st.markdown("<h4 style='text-align: center;'>Built with 💙 by a 16-year-old dev</h4>", unsafe_allow_html=True)
-st.caption("Disclaimer: This is an AI tool, not a lawyer.")
+st.caption("🛡️ Built by a 16-year-old dev | Disclaimer: AI analysis, not legal advice.")

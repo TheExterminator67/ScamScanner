@@ -4,7 +4,7 @@ from pypdf import PdfReader
 import re
 
 # SETUP
-st.set_page_config(page_title="Legal Guard", page_icon="🛡️")
+st.set_page_config(page_title="Legal Guard Pro", page_icon="🛡️", layout="wide")
 
 if "GEMINI_KEY" not in st.secrets:
     st.error("❌ Missing GEMINI_KEY in Secrets!")
@@ -19,59 +19,64 @@ try:
 except Exception as e:
     st.sidebar.error(f"❌ AI Connection Failed: {e}")
 
-# UI
-st.title("🛡️ Legal Guard: Scam Scanner")
+# UI BRANDING
+st.title("🛡️ Legal Guard: :blue[Pro Scanner]")
+st.markdown("### Detects scams, traps, and predatory language in seconds.")
 
-uploaded_file = st.file_uploader("Upload a PDF to scan for scams", type=["pdf"])
+uploaded_file = st.file_uploader("Upload a PDF contract", type=["pdf"])
 
 if uploaded_file:
-    with st.spinner("🕵️ AI Investigator is reading the document..."):
+    with st.spinner("🕵️ AI Investigator is deep-scanning the document..."):
         try:
-            # Extract text from PDF
+            # 1. Extract text from PDF
             reader = PdfReader(uploaded_file)
             text = "".join([page.extract_text() for page in reader.pages])
             
-            # FORMAT PROMPT
+            # 2. UPDATED PROMPT FOR HIGHLIGHTING & SUMMARY
             prompt = f"""
-            Analyze this document for scams. 
-            YOU MUST START YOUR RESPONSE WITH THIS EXACT LINE:
-            RISK SCORE: [number 1-10]
+            Analyze this document for scams and predatory traps. 
             
-            Then, provide a detailed report including:
-            - 🚩 Red Flags
-            - ⚖️ Legal Loopholes
-            - 💡 Advice
+            FORMATTING RULES:
+            - START with: 'RISK SCORE: [1-10]'
+            - HIGHLIGHT the most dangerous parts using Streamlit syntax: :red-background[dangerous text here]
+            - HIGHLIGHT important legal terms using: :blue-background[term here]
+            - END with a section titled '📝 SUMMARY' that gives a 2-sentence 'Bottom Line'.
+            
+            STRUCTURE:
+            1. Risk Score
+            2. 🚩 Red Flags (with highlights)
+            3. ⚖️ Legal Loopholes
+            4. 💡 Advice
+            5. 📝 SUMMARY
             
             Document text: {text[:8000]} 
             """
             
-            # GENERATE ANALYSIS
+            # 3. GENERATE ANALYSIS
             response = model.generate_content(prompt)
             full_analysis = response.text
             
-            # COLOR-CODED OUTPUT BASED ON RISK SCORE
+            # 4. EXTRACT RISK SCORE FOR UI COLORING
             score_match = re.search(r"RISK SCORE:\s*(\d+)", full_analysis)
             score = int(score_match.group(1)) if score_match else 5
             
             st.divider()
             
-            # DISPLAY BASED ON RISK LEVEL
+            # 5. DISPLAY RESULTS WITH COLOR CODING
             if score >= 7:
-                st.error(f"### 🚨 HIGH RISK (Score: {score}/10)")
-                st.markdown(f":red[{full_analysis}]")
+                st.error(f"### 🚨 HIGH RISK DETECTED (Score: {score}/10)")
             elif score >= 4:
                 st.warning(f"### ⚠️ MODERATE RISK (Score: {score}/10)")
-                st.markdown(full_analysis)
             else:
                 st.success(f"### ✅ LOW RISK (Score: {score}/10)")
-                st.markdown(f":green[{full_analysis}]")
                 st.snow()
+
+            # The main report container
+            with st.container(border=True):
+                st.markdown(full_analysis)
                 
         except Exception as e:
-            if "429" in str(e):
-                st.error("🚦 Google's Free Tier is busy. Wait 60 seconds and try again!")
-            else:
-                st.error(f"Error during analysis: {e}")
+            st.error(f"Error during analysis: {e}")
 
 st.divider()
-st.caption("Disclaimer: This is an AI tool, not a lawyer. Always read the fine print!")
+st.caption("Built with 💙 for Legal Safety | 2025")

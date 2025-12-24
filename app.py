@@ -1,73 +1,56 @@
 import streamlit as st
 import google.generativeai as genai
 from pypdf import PdfReader
-import re
 
-# SETUP
+# 1. Page Configuration
+st.set_page_config(page_title="Legal Guard", page_icon="🛡️")
+
+# 2. Secure API Setup
+# We check for the secret first. If it's not there, the app stops immediately with a clear message.
+if "GEMINI_KEY" not in st.secrets:
+    st.error("❌ GEMINI_KEY missing! Go to Streamlit Settings > Secrets and add it.")
+    st.stop()
+
+# Configure the AI with your secret key
 genai.configure(api_key=st.secrets["GEMINI_KEY"])
 
-# GEMINI MODEL
-model_names = ['gemini-3-flash', 'gemini-2.5-flash', 'gemini-1.5-flash']
-model = None
-for name in model_names:
-    try:
-        test_model = genai.GenerativeModel(name)
-        test_model.generate_content("test", generation_config={"max_output_tokens": 1})
-        model = test_model
-        break 
-    except: continue
+# 3. Initialize the Model GLOBALLY
+# By putting this here (not inside a function), the 'model' is NEVER None.
+model = genai.GenerativeModel('gemini-1.5-flash')
 
-# UI
-st.set_page_config(page_title="Legal Guard", page_icon="🛡️")
-st.title("🛡️ Legal Guard: Scam Scanner")
+# 4. PDF Helper Function
+def get_pdf_text(upload):
+    pdf = PdfReader(upload)
+    content = ""
+    for page in pdf.pages:
+        content += page.extract_text()
+    return content
 
-uploaded_file = st.file_uploader("Upload a PDF to scan for scams", type=["pdf"])
+# 5. User Interface
+st.title("🛡️ Legal Guard: AI Scam Scanner")
+st.write("I help you find hidden traps in contracts. Upload your PDF below.")
 
-if uploaded_file:
-    with st.spinner("🕵️ AI Investigator is reading the document..."):
-        # Extract text from PDF
-        reader = PdfReader(uploaded_file)
-        text = "".join([page.extract_text() for page in reader.pages])
-        
-        # FORMAT PROMPT
-        prompt = f"""
-        Analyze this document for scams. 
-        YOU MUST START YOUR RESPONSE WITH THIS EXACT LINE:
-        RISK SCORE: [number 1-10]
-        
-        Then, provide a detailed report including:
-        - 🚩 Red Flags
-        - ⚖️ Legal Loopholes
-        - 💡 Advice
-        
-        Document text: {text}
-        """
-        
-        try:
-            response = model.generate_content(prompt)
-            full_analysis = response.text
-            
-            # COLOR-CODED OUTPUT BASED ON RISK SCORE
-            # EXTRACT RISK SCORE
-            score_match = re.search(r"RISK SCORE:\s*(\d+)", full_analysis)
-            score = int(score_match.group(1)) if score_match else 5
-            
-            st.divider()
-            
-            # DISPLAY BASED ON RISK LEVEL
-            if score >= 7:
-                st.error(f"### 🚨 HIGH RISK (Score: {score}/10)")
-                st.markdown(f":red[{full_analysis}]")
-            elif score >= 4:
-                st.warning(f"### ⚠️ MODERATE RISK (Score: {score}/10)")
-                st.markdown(full_analysis)
-            else:
-                st.success(f"### ✅ LOW RISK (Score: {score}/10)")
-                st.markdown(f":green[{full_analysis}]")
-                st.snow()
+file = st.file_uploader("Upload Contract (PDF)", type="pdf")
+
+if st.button("Analyze Document"):
+    if file:
+        with st.spinner("Scanning for red flags..."):
+            try:
+                # Turn PDF into text
+                text_content = get_pdf_text(file)
                 
-        except Exception as e:
-            st.error(f"Error during analysis: {e}")
+                # Ask Gemini to scan it
+                prompt = f"Analyze this contract for scams, predatory language, or hidden fees: {text_content[:8000]}"
+                response = model.generate_content(prompt)
+                
+                # Show results
+                st.subheader("Analysis Results")
+                st.write(response.text)
+                st.success("Done!")
+            except Exception as e:
+                st.error(f"Analysis failed: {e}")
+    else:
+        st.warning("Please upload a file first!")
 
-
-st.caption("Disclaimer: This is an AI tool, not a lawyer. Always read the fine print!")
+st.divider()
+st.caption("Built by a 16-year-old dev | 2025 AI Safety Project")

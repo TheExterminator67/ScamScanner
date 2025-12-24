@@ -16,7 +16,7 @@ genai.configure(api_key=st.secrets["GEMINI_KEY"])
 
 # 3. Initialize the Model GLOBALLY
 # By putting this here (not inside a function), the 'model' is NEVER None.
-model = genai.GenerativeModel('gemini-1.5-flash')
+model = genai.GenerativeModel('gemini-2.0-flash')
 
 # 4. PDF Helper Function
 def get_pdf_text(upload):
@@ -54,3 +54,4 @@ if st.button("Analyze Document"):
 
 st.divider()
 st.caption("Built by a 16-year-old dev | 2025 AI Safety Project")
+

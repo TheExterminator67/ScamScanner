@@ -3,81 +3,74 @@ import google.generativeai as genai
 from pypdf import PdfReader
 import re
 
-# SETUP
+# 1. SETUP & PAGE CONFIG
 st.set_page_config(page_title="Legal Guard Pro", page_icon="🛡️", layout="wide")
 
-if "GEMINI_KEY" not in st.secrets:
-    st.error("❌ Missing GEMINI_KEY in Secrets!")
-    st.stop()
+# 2. LANGUAGE SELECTOR (The "Translation Thingy")
+with st.sidebar:
+    st.title("🌐 Settings")
+    language = st.selectbox(
+        "Select Language / Pilih Bahasa",
+        ["English", "Spanish", "French", "German", "Hindi", "Indonesian", "Chinese"]
+    )
+    st.divider()
+    if st.button("Clear Chat History"):
+        st.session_state.messages = []
 
+# 3. AI CONFIG
 genai.configure(api_key=st.secrets["GEMINI_KEY"])
+model = genai.GenerativeModel('gemini-3-flash-preview')
 
-# GEMINI MODEL
-try:
-    model = genai.GenerativeModel('gemini-3-flash-preview')
-    st.sidebar.success("✅ AI Brain Connected")
-except Exception as e:
-    st.sidebar.error(f"❌ AI Connection Failed: {e}")
+# Initialize Chat History
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-# UI BRANDING
-st.title("🛡️ Legal Hero: :blue[ScamScanner]")
-st.markdown("### Detects scams, traps, and predatory language in seconds.")
+# 4. MAIN UI
+st.title("🛡️ Legal Guard: :blue[Global Scanner]")
 
 uploaded_file = st.file_uploader("Upload a PDF contract", type=["pdf"])
 
-if uploaded_file:
-    with st.spinner("🕵️ AI Investigator is deep-scanning the document..."):
-        try:
-            # 1. Extract text from PDF
-            reader = PdfReader(uploaded_file)
-            text = "".join([page.extract_text() for page in reader.pages])
-            
-            # 2. UPDATED PROMPT FOR HIGHLIGHTING & SUMMARY
-            prompt = f"""
-            Analyze this document for scams and predatory traps. 
-            
-            FORMATTING RULES:
-            - START with: 'RISK SCORE: [1-10]'
-            - HIGHLIGHT the most dangerous parts using Streamlit syntax: :red-background[dangerous text here]
-            - HIGHLIGHT important legal terms using: :blue-background[term here]
-            - END with a section titled '📝 SUMMARY' that gives a 2-sentence 'Bottom Line'.
-            
-            STRUCTURE:
-            1. Risk Score
-            2. 🚩 Red Flags (with highlights)
-            3. ⚖️ Legal Loopholes
-            4. 💡 Advice
-            5. 📝 SUMMARY
-            
-            Document text: {text[:8000]} 
-            """
-            
-            # 3. GENERATE ANALYSIS
-            response = model.generate_content(prompt)
-            full_analysis = response.text
-            
-            # 4. EXTRACT RISK SCORE FOR UI COLORING
-            score_match = re.search(r"RISK SCORE:\s*(\d+)", full_analysis)
-            score = int(score_match.group(1)) if score_match else 5
-            
-            st.divider()
-            
-            # 5. DISPLAY RESULTS WITH COLOR CODING
-            if score >= 7:
-                st.error(f"### 🚨 HIGH RISK DETECTED (Score: {score}/10)")
-            elif score >= 4:
-                st.warning(f"### ⚠️ MODERATE RISK (Score: {score}/10)")
-            else:
-                st.success(f"### ✅ LOW RISK (Score: {score}/10)")
-                st.snow()
+# --- SCANNING LOGIC ---
+if uploaded_file and st.button("🚀 Start Deep Scan"):
+    with st.spinner("🕵️ Analyzing..."):
+        reader = PdfReader(uploaded_file)
+        text = "".join([page.extract_text() for page in reader.pages])
+        
+        # We tell the AI to translate the entire report into the chosen language
+        prompt = f"""
+        Analyze this document for scams.
+        LANGUAGE: {language}
+        RULES: Start with 'RISK SCORE: [1-10]'. Use colors and emojis.
+        End with a '📝 SUMMARY'.
+        Text: {text[:8000]}
+        """
+        response = model.generate_content(prompt)
+        
+        # Save to chat history
+        st.session_state.messages.append({"role": "assistant", "content": response.text})
 
-            # The main report container
-            with st.container(border=True):
-                st.markdown(full_analysis)
-                
-        except Exception as e:
-            st.error(f"Error during analysis: {e}")
-
+# --- 5. THE CHATBOX (Highkey Feature) ---
 st.divider()
-st.caption("Built with 💙 for Legal Safety , by a 16 year old | 2025")
+st.subheader("💬 Chat with your AI Investigator")
 
+# Display chat messages from history on app rerun
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
+
+# React to user input
+if chat_input := st.chat_input("Ask a follow-up question about the contract..."):
+    # Display user message in chat message container
+    st.chat_message("user").markdown(chat_input)
+    # Add user message to chat history
+    st.session_state.messages.append({"role": "user", "content": chat_input})
+
+    # Get AI response
+    with st.chat_message("assistant"):
+        with st.spinner("Thinking..."):
+            chat_prompt = f"The user is asking about the previous contract in {language}: {chat_input}"
+            response = model.generate_content(chat_prompt)
+            st.markdown(response.text)
+    
+    # Add assistant response to chat history
+    st.session_state.messages.append({"role": "assistant", "content": response.text})

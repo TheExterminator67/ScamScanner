@@ -14,7 +14,8 @@ if "GEMINI_KEY" not in st.secrets:
 genai.configure(api_key=st.secrets["GEMINI_KEY"])
 
 # Initialize the Model GLOBALLY
-model = genai.GenerativeModel('gemini-1.5-flash')
+# Using the '-latest' suffix fixes the 404/v1beta mismatch
+model = genai.GenerativeModel('gemini-1.5-flash-latest')
 
 # PDF Helper Function
 def get_pdf_text(upload):
@@ -52,6 +53,7 @@ if st.button("Analyze Document"):
 
 st.divider()
 st.caption("Built by a 16-year-old dev | 2025 AI Safety Project")
+
 
 
 

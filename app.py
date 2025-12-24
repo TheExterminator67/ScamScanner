@@ -3,7 +3,7 @@ import google.generativeai as genai
 from pypdf import PdfReader
 import re
 
-# --- 1. SETUP ---
+# SETUP
 st.set_page_config(page_title="Legal Hero", page_icon="🛡️", layout="wide")
 
 if "GEMINI_KEY" not in st.secrets:
@@ -17,14 +17,14 @@ model = genai.GenerativeModel('gemini-3-flash-preview')
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# --- 2. SIDEBAR (Translation & Credits) ---
+# SIDEBAR (Translation & Credits)
 with st.sidebar:
     st.title("🛡️ Legal Hero")
     
-    # Subtle Credit in Sidebar
+    # Credit in Sidebar
     st.markdown("👨‍💻 **Dev:** 16-year-old developer")
     
-    # THE TRANSLATION THINGY (Arabic Added)
+    # THE TRANSLATION
     language = st.selectbox(
         "🌐 Select Language",
         ["English", "Arabic", "Spanish", "French", "German", "Chinese", "Hindi", "Indonesian"]
@@ -34,7 +34,7 @@ with st.sidebar:
     if st.button("Clear Chat History"):
         st.session_state.messages = []
 
-# --- 3. MAIN UI ---
+# MAIN UI
 st.title("🛡️ Legal Hero: Scam Scanner")
 
 uploaded_file = st.file_uploader("Upload a PDF to scan for scams", type=["pdf"])
@@ -46,7 +46,7 @@ if uploaded_file:
                 reader = PdfReader(uploaded_file)
                 text = "".join([page.extract_text() for page in reader.pages])
                 
-                # FORMAT PROMPT (Instructing Arabic Support)
+                # FORMAT PROMPT
                 prompt = f"""
                 Analyze this document for scams. Respond entirely in {language}.
                 YOU MUST START YOUR RESPONSE WITH: RISK SCORE: [number 1-10]
@@ -71,7 +71,7 @@ if uploaded_file:
             except Exception as e:
                 st.error(f"Error during analysis: {e}")
 
-# --- 4. FLOATING CHATBOX (Bottom Right) ---
+# CHATBOT
 st.write("---")
 col1, col2 = st.columns([8, 2])
 with col2:
@@ -91,7 +91,8 @@ with col2:
                 st.markdown(chat_res.text)
                 st.session_state.messages.append({"role": "assistant", "content": chat_res.text})
 
-# --- 5. CLEAN FOOTER ---
+# CLEAN AHH FOOTER
 st.divider()
 st.caption("🛡️ Built by a 16-year-old dev | Disclaimer: AI analysis, not legal advice.")
+
 

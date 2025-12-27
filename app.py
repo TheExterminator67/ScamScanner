@@ -7,8 +7,14 @@ import streamlit as st
 
 st.html("""
     <head>
-        <meta name="google-site-verification" content="<meta name="google-site-verification" content="SkyhdLWc39taMrOPcGfdZFp1arwcIti0nrYcMT9I4lI" />" />
-    </head>
+       import streamlit as st
+
+# This goes BEFORE st.set_page_config
+st.html("""
+    <meta name="google-site-verification" content="SkyhdLWc39taMrOPcGfdZFp1arwcIti0nrYcMT9I4lI" />
+""")
+
+st.set_page_config(page_title="Legal Guard", page_icon="🛡️")
 """)
 
 # SETUP
@@ -102,6 +108,7 @@ with col2:
 # CLEAN AHH FOOTER
 st.divider()
 st.caption("🛡️ Built by a 16-year-old dev | Disclaimer: AI analysis, not legal advice.")
+
 
 
 

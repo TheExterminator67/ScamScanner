@@ -24,7 +24,7 @@ with st.sidebar:
     st.title("🛡️ Legal Hero")
     
     # Credit in Sidebar
-    st.markdown("👨‍💻 **Dev:** 16-year-old developer")
+    st.markdown("👨‍💻 **Dev:** Sultan Alnuaimi")
     
     # THE TRANSLATION
     language = st.selectbox(
@@ -32,7 +32,7 @@ with st.sidebar:
         ["English", "Arabic", "Spanish", "French", "German", "Chinese", "Hindi", "Indonesian"]
     )
     st.divider()
-    st.success("✅ AI Brain Connected")
+    st.success("✅ AI Connected")
     if st.button("Clear Chat History"):
         st.session_state.messages = []
 
